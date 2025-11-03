@@ -1,3 +1,4 @@
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -162,7 +163,7 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
 
     if (permission == LocationPermission.deniedForever) {
       const error =
-          PermissionDeniedException('Location Permission is denied forever');
+      PermissionDeniedException('Location Permission is denied forever');
       onError(error);
       // Permissions are denied forever, handle appropriately.
       return Future.error(error);
@@ -200,7 +201,7 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
         },
       );
       final decodedResponse =
-          jsonDecode(utf8.decode(response.bodyBytes)) as Map<dynamic, dynamic>;
+      jsonDecode(utf8.decode(response.bodyBytes)) as Map<dynamic, dynamic>;
 
       final posData = _getLocationData(decodedResponse);
 
@@ -243,15 +244,15 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
     final address = addressData.entries
         .where(
           (entry) => !RegExp(
-            '^(neighbourhood|municipality|state|country_code|village|region|suburb|city_district|hamlet|county|ISO.*)',
-          ).hasMatch(entry.key),
-        )
+        '^(neighbourhood|municipality|state|country_code|village|region|suburb|city_district|hamlet|county|ISO.*)',
+      ).hasMatch(entry.key),
+    )
         .fold<String>(
-          '',
+      '',
           (previousValue, element) => previousValue.isEmpty
-              ? element.value
-              : '$previousValue, ${element.value}',
-        );
+          ? element.value
+          : '$previousValue, ${element.value}',
+    );
 
     return LocationData(
       address: address,
@@ -325,9 +326,9 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
         return ListTile(
           leading: isHistory
               ? Icon(
-                  Icons.watch_later_outlined,
-                  color: widget.iconColor,
-                )
+            Icons.watch_later_outlined,
+            color: widget.iconColor,
+          )
               : null,
           trailing: Icon(
             Icons.chevron_right,
@@ -376,25 +377,37 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
             focusNode: _focusNode,
             decoration: InputDecoration(
               filled: true,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
               fillColor:
-                  widget.searchBarBackgroundColor ?? _defaultSearchBarColor,
+              widget.searchBarBackgroundColor ?? _defaultSearchBarColor,
               hintText: widget.searchBarHintText,
               hintTextDirection: isRTL(widget.searchBarHintText)
                   ? TextDirection.rtl
                   : TextDirection.ltr,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Color(0xffE5E5EA)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Color(0xffE5E5EA)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Color(0xffE5E5EA)),
               ),
               hintStyle: TextStyle(color: widget.searchBarHintColor),
-              suffixIcon: IconButton(
-                onPressed: _searchController.clear,
-                icon: Icon(
-                  Icons.clear,
-                  color: widget.iconColor,
-                ),
+              prefixIcon: Icon(
+                Icons.search,
+                color: Color(0xff3B3A3A),
               ),
+              // suffixIcon: IconButton(
+              //   onPressed: _searchController.clear,
+              //   icon: Icon(
+              //     Icons.clear,
+              //     color: widget.iconColor,
+              //   ),
+              // ),
             ),
             onChanged: (value) {
               _debounce.run(() async {
@@ -413,21 +426,11 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
             controller: ScrollController(),
             slivers: [
               SliverToBoxAdapter(
-                child: _buildSelectCurrentPositionButton(),
+                child: SizedBox(),
               ),
               _buildListView(),
             ],
           ),
-        ),
-          Container(
-          margin: const EdgeInsets.all(5),
-              
-              child: const  Text(
-                '© OpenStreetMap contributors.',
-                style: TextStyle(
-                  fontSize: 10,
-                ),
-              ),
         ),
       ],
     );
@@ -451,14 +454,14 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
     );
 
     final response = await _client.get(
-        Uri.parse(url),
-        headers: {
-          'User-Agent': widget.userAgent.toString(),
-        },
-      );
+      Uri.parse(url),
+      headers: {
+        'User-Agent': widget.userAgent.toString(),
+      },
+    );
 
     final decodedResponse =
-        jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
+    jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
     return decodedResponse.map((e) => _getLocationData(e)).toList();
   }
 
@@ -493,18 +496,18 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
         ),
         trailing: _isCurrentLocationLoading
             ? SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  color: widget.iconColor,
-                  strokeWidth: 3,
-                ),
-              )
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(
+            color: widget.iconColor,
+            strokeWidth: 3,
+          ),
+        )
             : Icon(
-                Icons.chevron_right,
-                color: widget.iconColor,
-                size: 30,
-              ),
+          Icons.chevron_right,
+          color: widget.iconColor,
+          size: 30,
+        ),
       ),
     );
   }
@@ -520,7 +523,7 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
       child: SizedBox(
         // height: MediaQuery.of(context).size.height - 300,
         child:
-            isLoading ? Center(child: widget.loadingWidget) : _buildSearchBar(),
+        isLoading ? Center(child: widget.loadingWidget) : _buildSearchBar(),
       ),
     );
   }
@@ -529,9 +532,11 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
   ///
   Widget _buildScaffold() {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
+        bottom: false,
         child:
-            isLoading ? Center(child: widget.loadingWidget) : _buildSearchBar(),
+        isLoading ? Center(child: widget.loadingWidget) : _buildSearchBar(),
       ),
     );
   }
@@ -561,22 +566,22 @@ class LocationSearch {
     int historyMaxLength = 5,
   }) {
     LocationSearchWidget builder(BuildContext ctx) => LocationSearchWidget(
-          onPicked: (data) => Navigator.pop(context, data),
-          onError: onError,
-          language: language,
-          countryCodes: countryCodes,
-          searchBarBackgroundColor: searchBarBackgroundColor,
-          searchBarTextColor: searchBarTextColor,
-          searchBarHintText: searchBarHintText,
-          currentPositionButtonText: currentPositionButtonText,
-          searchBarHintColor: searchBarHintColor,
-          lightAddress: lightAddress,
-          iconColor: iconColor,
-          loadingWidget: loadingWidget,
-          mode: mode,
-          historyMaxLength: historyMaxLength,
-          userAgent: userAgent,
-        );
+      onPicked: (data) => Navigator.pop(context, data),
+      onError: onError,
+      language: language,
+      countryCodes: countryCodes,
+      searchBarBackgroundColor: searchBarBackgroundColor,
+      searchBarTextColor: searchBarTextColor,
+      searchBarHintText: searchBarHintText,
+      currentPositionButtonText: currentPositionButtonText,
+      searchBarHintColor: searchBarHintColor,
+      lightAddress: lightAddress,
+      iconColor: iconColor,
+      loadingWidget: loadingWidget,
+      mode: mode,
+      historyMaxLength: historyMaxLength,
+      userAgent: userAgent,
+    );
 
     if (mode == Mode.overlay) {
       return showDialog(context: context, builder: builder);
@@ -584,3 +589,5 @@ class LocationSearch {
     return Navigator.push(context, MaterialPageRoute(builder: builder));
   }
 }
+
+
