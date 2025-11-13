@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart' as intl;
@@ -118,6 +119,7 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
   final FocusNode _focusNode = FocusNode();
   List<LocationData> _options = <LocationData>[];
   bool isLoading = false;
+  bool _isSearching = false;
   late void Function(Exception e) onError;
   final _defaultSearchBarColor = Colors.grey[300];
 
@@ -306,6 +308,12 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
     super.initState();
     onError = widget.onError ?? logger.e;
     _loadHistory();
+    // Auto-focus keyboard when mode is fullscreen
+    if (widget.mode == Mode.fullscreen) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _focusNode.requestFocus();
+      });
+    }
   }
 
   @override
@@ -369,6 +377,7 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
         Padding(
           padding: const EdgeInsets.all(16),
           child: TextFormField(
+            autofocus: widget.mode == Mode.fullscreen,
             textDirection: isRTL(_searchController.text)
                 ? TextDirection.rtl
                 : TextDirection.ltr,
@@ -401,20 +410,37 @@ class _LocationSearchWidgetState extends State<LocationSearchWidget> {
                 Icons.search,
                 color: Color(0xff3B3A3A),
               ),
-              // suffixIcon: IconButton(
-              //   onPressed: _searchController.clear,
-              //   icon: Icon(
-              //     Icons.clear,
-              //     color: widget.iconColor,
-              //   ),
-              // ),
+              suffixIcon: _isSearching
+                  ? Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: CupertinoActivityIndicator(
+                        radius: 10,
+                        color: widget.iconColor,
+                      ),
+                    )
+                  : null,
             ),
             onChanged: (value) {
+              if (value.isEmpty) {
+                setState(() {
+                  _isSearching = false;
+                  _options = [];
+                });
+                return;
+              }
+              setState(() {
+                _isSearching = true;
+              });
               _debounce.run(() async {
                 try {
                   _options = await _onSearch(value);
-                  setState(() {});
+                  setState(() {
+                    _isSearching = false;
+                  });
                 } on Exception catch (e) {
+                  setState(() {
+                    _isSearching = false;
+                  });
                   onError(e);
                 }
               });
